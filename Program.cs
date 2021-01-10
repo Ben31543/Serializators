@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 namespace Serializator
 {
     [Serializable]
-    public class User : ISerializable
+    public class User
     {
         public int Age { get; set; }
 
@@ -14,15 +14,19 @@ namespace Serializator
         public string Nationality { get; set; }
 
         [OnSerializing]
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        private void OnSerializing(StreamingContext context)
         {
             Type type = typeof(User);
-            MemberInfo[] memberInfo = type.GetMembers();
+            MemberInfo[] memberInfo = type.GetProperties();
 
-            for (int i = 0; i < memberInfo.Length; i++)
+            foreach (PropertyInfo property in memberInfo)
             {
-                if (memberInfo[i].GetType().Equals("System.Int32"))
-                    info.GetInt32("Age");
+                if (property.PropertyType == typeof(int))
+                {
+                    property.SetValue(this, 
+                        (int)property
+                        .GetValue(this) - 1);
+                }
             }
         }
     }
@@ -31,7 +35,8 @@ namespace Serializator
     {
         static void Main(string[] args)
         {
-            string filePath = "C:\\Users\\benat\\Desktop\\file.xml";
+            string filePath = "C:\\Users\\benat\\Desktop\\file2.txt";
+
             var user = new User
             {
                 Age = 17,
@@ -39,7 +44,7 @@ namespace Serializator
                 Nationality = "Arm"
             };
 
-            Console.WriteLine("OK");
+            Console.WriteLine("Success");
         }
     }
 }
