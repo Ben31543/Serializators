@@ -29,22 +29,39 @@ namespace Serializator
                 }
             }
         }
+
+        [OnDeserialized]
+        private void OnDeserialized(StreamingContext context)
+        {
+            Type type = typeof(User);
+            MemberInfo[] memberInfo = type.GetProperties();
+
+            foreach (PropertyInfo property in memberInfo)
+            {
+                if (property.PropertyType == typeof(int))
+                {
+                    property.SetValue(this,
+                        (int)property
+                        .GetValue(this) + 1);
+                }
+            }
+        }
     }
 
     class Program
     {
         static void Main(string[] args)
         {
-            string filePath = "C:\\Users\\benat\\Desktop\\file2.txt";
+            string filePath = @"C:\Users\benat\Desktop\file.txt";
 
             var user = new User
             {
-                Age = 17,
                 Name = "Ben",
+                Age = 17,
                 Nationality = "Arm"
             };
 
-            Console.WriteLine("Success");
+            JsonSerializator.SerializeToJson<User>(user, filePath);
         }
     }
 }
