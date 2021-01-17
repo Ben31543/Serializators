@@ -16,14 +16,7 @@ namespace Serializator
 
             using (StreamWriter writer = new StreamWriter(filePath))
             {
-                foreach (MethodInfo method in memberInfo)
-                {
-                    if (Attribute.IsDefined(method, typeof(OnSerializingAttribute)))
-                    {
-                        method.Invoke(method, null);
-                    }
-                }
-                var json = JsonSerializer.Serialize(objectGraph, typeof(T));
+                var json = JsonConvert.SerializeObject(objectGraph);
                 writer.WriteLine(json);
             }
         }
